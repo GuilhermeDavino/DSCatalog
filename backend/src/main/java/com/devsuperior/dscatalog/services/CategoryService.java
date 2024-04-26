@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devsuperior.dscatalog.dtos.CategoryDTO;
 import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
+import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class CategoryService {
@@ -20,6 +21,21 @@ public class CategoryService {
 	public List<CategoryDTO> findAll() {
 		List<Category> categories = repository.findAll();
 		return categories.stream().map(item -> new CategoryDTO(item)).toList();
+	}
+	
+	@Transactional(readOnly = true)
+	public CategoryDTO findById(Long id) {
+		Category category = repository.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException("Recurso não encontrado"));
+		
+		return new CategoryDTO(category);
+	}
+	
+	@Transactional
+	public CategoryDTO insert(CategoryDTO dto) {
+		Category entity = new Category(dto);
+		entity = repository.save(entity);
+		return new CategoryDTO(entity);
 	}
 	
 }
