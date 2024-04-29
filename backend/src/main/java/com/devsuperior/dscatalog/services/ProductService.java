@@ -8,8 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.devsuperior.dscatalog.dtos.CategoryDTO;
 import com.devsuperior.dscatalog.dtos.ProductDTO;
+import com.devsuperior.dscatalog.entities.Category;
 import com.devsuperior.dscatalog.entities.Product;
+import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
@@ -21,6 +24,9 @@ public class ProductService {
 
 	@Autowired
 	private ProductRepository repository;
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
 
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
@@ -39,7 +45,7 @@ public class ProductService {
 	@Transactional
 	public ProductDTO insert(ProductDTO dto) {
 		Product entity = new Product();
-		entity = dtoToEntity(entity, dto);
+		entity = dtoToEntity(dto, entity);
 		entity = repository.save(entity);
 		return new ProductDTO(entity);
 	}
@@ -48,7 +54,7 @@ public class ProductService {
 	public ProductDTO update(Long id, ProductDTO dto) {
 		try {
 			Product entity = repository.getReferenceById(id);
-			entity = dtoToEntity(entity, dto);
+			entity = dtoToEntity(dto, entity);
 			repository.save(entity);
 			return new ProductDTO(entity);
 		} catch(EntityNotFoundException e) {
@@ -73,12 +79,19 @@ public class ProductService {
 		
 	}
 
-	public Product dtoToEntity(Product entity, ProductDTO dto) {
+	private Product dtoToEntity(ProductDTO dto, Product entity) {
 		entity.setName(dto.getName());
 		entity.setPrice(dto.getPrice());
 		entity.setDescription(dto.getDescription());
 		entity.setDate(dto.getDate());
 		entity.setImgUrl(dto.getImgUrl());
+		entity.getCategories().clear();
+		
+		for(CategoryDTO catDTO : dto.getCategories()) {
+			Category category = categoryRepository.findById(catDTO.getId()).orElseThrow(
+					() -> new ResourceNotFoundException("Recurso não encontrado"));
+			entity.getCategories().add(category);
+		}
 		return entity;
 	}
 
