@@ -36,7 +36,7 @@ public class ProductController {
 	}
 	
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<ProductDTO> findAll(@PathVariable Long id) { 
+	public ResponseEntity<ProductDTO> findById(@PathVariable Long id) { 
 		ProductDTO category = service.findById(id);
 		
 		return ResponseEntity.ok().body(category);
