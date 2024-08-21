@@ -36,7 +36,7 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public Page<UserDTO> findAllPaged(Pageable pageable) {
 		Page<User> users = repository.findAll(pageable);
-		return users.map(item -> new UserDTO());
+		return users.map(item -> new UserDTO(item));
 	}
 
 	@Transactional(readOnly = true)
