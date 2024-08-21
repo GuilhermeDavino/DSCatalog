@@ -2,6 +2,8 @@ package com.devsuperior.dscatalog.entities;
 
 import java.util.Objects;
 
+import com.devsuperior.dscatalog.dtos.RoleDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +26,12 @@ public class Role {
 		super();
 		this.id = id;
 		this.authority = authority;
+	}
+	
+	public Role(RoleDTO dto) {
+		super();
+		this.id = dto.getId();
+		this.authority = dto.getAuthority();
 	}
 
 	public long getId() {
