@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dtos.ProductDTO;
 import com.devsuperior.dscatalog.tests.ProductFactory;
+import com.devsuperior.dscatalog.tests.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -30,6 +31,11 @@ public class ProductControllerIT {
 	@Autowired
 	private ObjectMapper objectMapper;
 	
+	@Autowired
+	private TokenUtil tokenUtil;
+	
+	private String username, password, bearerToken;
+	
 	private Long existingId;
 	private Long nonExistingId;
 	private Long totalCountsProducts;
@@ -41,6 +47,10 @@ public class ProductControllerIT {
 		nonExistingId = -1L;
 		totalCountsProducts = 25L;
 		productDTO = ProductFactory.createDTO();
+		
+		username = "maria@gmail.com";
+		password = "123456";
+		bearerToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
 	}
 	
 	@Test
@@ -63,6 +73,7 @@ public class ProductControllerIT {
 
 		ResultActions result = mockMvc.perform(put("/products/{id}", existingId)
 				.content(jsonBody)
+				.header("Authorization", "Bearer " + bearerToken)
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON));
 		result.andExpect(status().isOk());
@@ -77,6 +88,7 @@ public class ProductControllerIT {
 	public void updateShouldReturnNotFoundWhenIdDoesNotExists() throws Exception {
 		String jsonBody = objectMapper.writeValueAsString(productDTO);
 		ResultActions result = mockMvc.perform(put("/products/{id}", nonExistingId)
+				.header("Authorization", "Bearer " + bearerToken)
 				.content(jsonBody)
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON));
