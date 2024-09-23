@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ public class ProductController {
 	
 	
 	@GetMapping
+	
 	public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) { 
 		
 		
@@ -37,6 +39,7 @@ public class ProductController {
 		return ResponseEntity.ok().body(list);
 	}
 	
+	@PreAuthorize("HasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<ProductDTO> findById(@PathVariable Long id) { 
 		ProductDTO category = service.findById(id);
@@ -44,6 +47,7 @@ public class ProductController {
 		return ResponseEntity.ok().body(category);
 	}
 	
+	@PreAuthorize("HasRole('ROLE_ADMIN')")
 	@PostMapping
 	public ResponseEntity<ProductDTO> insert(@RequestBody @Valid ProductDTO dto) {
 		dto = service.insert(dto);
