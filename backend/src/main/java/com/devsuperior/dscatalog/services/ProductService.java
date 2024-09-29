@@ -21,6 +21,7 @@ import com.devsuperior.dscatalog.repositories.CategoryRepository;
 import com.devsuperior.dscatalog.repositories.ProductRepository;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
+import com.devsuperior.dscatalog.util.Utils;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -102,14 +103,19 @@ public class ProductService {
 	
 	@Transactional(readOnly = true)
 	public Page<ProductDTO> findAllPaged(String name, String categoryId, Pageable pageable) {
+		
 		List<Long> categoryIds = Arrays.asList();
+		
 		if(!"0".equals(categoryId)) {
 			categoryIds = Arrays.asList(categoryId.split(",")).stream().map(Long::parseLong).toList();
 		}
 		
 		Page<ProductProjection> page = repository.searchProducts(categoryIds, name, pageable);
 		List<Long> productIds = page.map(x -> x.getId()).toList();
+		
 		List<Product> entities = repository.searchProductsWithCategorys(productIds);
+		entities = Utils.replace(page.getContent(), entities);
+		
 		List<ProductDTO> dtos = entities.stream().map(p -> new ProductDTO(p, p.getCategories())).toList();
 		Page<ProductDTO> pageDTO = new PageImpl<>(dtos, page.getPageable(), page.getTotalElements());
 		return pageDTO;
