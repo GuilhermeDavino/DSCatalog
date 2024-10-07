@@ -45,7 +45,7 @@ public class ControllerExceptionHandler {
 	@ExceptionHandler(EmailException.class)
     public ResponseEntity<StandardError> email(EmailException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        StandardError err = new StandardError(Instant.now(), status.value(), e.getMessage(), "Error Email", request.getRequestURI());
-        return ResponseEntity.status(status).body(err);
+        StandardError err = new StandardError(Instant.now(), status.value(), e.getMessage(), "Faild to send email", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
     }
 }
