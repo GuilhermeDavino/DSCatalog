@@ -39,6 +39,9 @@ public class UserService implements UserDetailsService {
 	
 	@Autowired
 	private BCryptPasswordEncoder passwordEnconder;
+	
+	@Autowired
+	private AuthService authService;
 
 	@Transactional(readOnly = true)
 	public Page<UserDTO> findAllPaged(Pageable pageable) {
@@ -51,6 +54,12 @@ public class UserService implements UserDetailsService {
 		User user = repository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Recurso não encontrado"));
 
+		return new UserDTO(user);
+	}
+	
+	@Transactional(readOnly = true)
+	public UserDTO findMe() {
+		User user = authService.authenticated();
 		return new UserDTO(user);
 	}
 

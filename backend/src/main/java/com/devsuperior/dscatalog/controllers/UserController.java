@@ -43,9 +43,17 @@ public class UserController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<UserDTO> findById(@PathVariable Long id) { 
-		UserDTO category = service.findById(id);
+		UserDTO user = service.findById(id);
 		
-		return ResponseEntity.ok().body(category);
+		return ResponseEntity.ok().body(user);
+	}
+	
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_OPERATOR')")
+	@GetMapping(value = "/me")
+	public ResponseEntity<UserDTO> findMe() { 
+		UserDTO user = service.findMe();
+		
+		return ResponseEntity.ok().body(user);
 	}
 	
 	@PostMapping
